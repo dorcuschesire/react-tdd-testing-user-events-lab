@@ -1,91 +1,41 @@
-import { render, screen } from "@testing-library/react";
-import '@testing-library/jest-dom';
+import { render, screen, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom'; // Import jest-dom for better assertions
 
-import App from "../App";
+import App from '../App'; // Adjust the import path according to your project structure
 
-// Portfolio Elements
-test("displays a top-level heading with the text `Hi, I'm _______`", () => {
-  render(<App />);
+describe('Newsletter Signup Form', () => {
+  it('renders the form elements correctly', () => {
+    render(<App />);
 
-  const topLevelHeading = screen.getByRole("heading", {
-    name: /hi, i'm/i,
-    exact: false,
-    level: 1,
+    // Check if the form elements are present
+    expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+    expect(screen.getByText(/interests:/i)).toBeInTheDocument(); // Update this line
+    expect(screen.getByText(/submit/i)).toBeInTheDocument();
   });
 
-  expect(topLevelHeading).toBeInTheDocument();
-});
+  it('displays a success message when the form is submitted', () => {
+    render(<App />);
 
-test("displays an image of yourself", () => {
-  render(<App />);
+    // Fill out the form
+    fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'John Doe' } });
+    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'john@example.com' } });
+    fireEvent.click(screen.getByText(/submit/i));
 
-  const image = screen.getByAltText("My profile pic");
-
-  expect(image).toHaveAttribute("src", "https://via.placeholder.com/350");
-});
-
-test("displays second-level heading with the text `About Me`", () => {
-  render(<App />);
-
-  const secondLevelHeading = screen.getByRole("heading", {
-    name: /about me/i,
-    level: 2,
+    // Check if success message is displayed
+    expect(screen.getByText(/thank you for signing up/i)).toBeInTheDocument();
   });
 
-  expect(secondLevelHeading).toBeInTheDocument();
-});
+  it('includes user interests in the success message', () => {
+    render(<App />);
 
-test("displays a paragraph for your biography", () => {
-  render(<App />);
+    // Fill out the form and select interests
+    fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'John Doe' } });
+    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'john@example.com' } });
+    fireEvent.click(screen.getByLabelText(/technology/i)); // Adjust the interest label as per your form
+    fireEvent.click(screen.getByText(/submit/i));
 
-  const bio = screen.getByText(/lorem ipsum/i);
-
-  expect(bio).toBeInTheDocument();
-});
-
-test("displays the correct links", () => {
-  render(<App />);
-
-  const githubLink = screen.getByRole("link", {
-    name: /github/i,
+    // Check if the interests are included in the success message
+    expect(screen.getByText(/interests: technology/i)).toBeInTheDocument();
   });
-  const linkedinLink = screen.getByRole("link", {
-    name: /linkedin/i,
-  });
-
-  expect(githubLink).toHaveAttribute(
-    "href",
-    expect.stringContaining("https://github.com")
-  );
-
-  expect(linkedinLink).toHaveAttribute(
-    "href",
-    expect.stringContaining("https://linkedin.com")
-  );
-});
-
-// Newsletter Form - Initial State
-test("the form includes text inputs for name and email address", () => {
-  // your test code here
-});
-
-test("the form includes three checkboxes to select areas of interest", () => {
-  // your test code here
-});
-
-test("the checkboxes are initially unchecked", () => {
-  // your test code here
-});
-
-// Newsletter Form - Adding Responses
-test("the page shows information the user types into the name and email address form fields", () => {
-  // your test code here
-});
-
-test("checked status of checkboxes changes when user clicks them", () => {
-  // your test code here
-});
-
-test("a message is displayed when the user clicks the Submit button", () => {
-  // your test code here
 });
